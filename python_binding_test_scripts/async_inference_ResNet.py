@@ -10,7 +10,7 @@ params.scheduling_algorithm = HailoSchedulingAlgorithm.ROUND_ROBIN
 with VDevice(params) as vdevice:
 
     # Create an infer model from an HEF:
-    infer_model = vdevice.create_infer_model('./../hefs/ResNet50.hef')
+    infer_model = vdevice.create_infer_model('./../hef_models/shortcut_net.hef')
 
     # Configure the infer model and create bindings for it
     with infer_model.configure() as configured_infer_model:
