@@ -51,10 +51,11 @@ If encountering the following error log when running your compiled examples for 
 [HailoRT] [error] CHECK failed - max_desc_page_size given 16384 is bigger than hw max desc page size 4096
 ```
 
-Do the following modification to the hailo_pci.conf file and update module:
+Verify if the hailo_pci.conf file is existant. If not, create it. Then add "force_desc_page_size=4096" line to the document: 
 ```bash 
-sudo vim /etc/modprobe.d/hailo_pci.conf #vim, nano or any editor
-# add following line to document:  options hailo_pci force_desc_page_size=4096
+[ -f "/etc/modprobe.d/hailo_pci.conf" ] && echo "File exists" || echo "File does not exist"
+# verify if exists, if not, make it : $touch "/etc/modprobe.d/hailo_pci.conf"
+echo force_desc_page_size=4096 >> /etc/modprobe.d/hailo_pci.conf
 
 # save, close document and run following update commands:
 sudo depmod -a
