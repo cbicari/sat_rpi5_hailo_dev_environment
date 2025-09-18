@@ -51,13 +51,11 @@ If encountering the following error log when running your compiled examples for 
 [HailoRT] [error] CHECK failed - max_desc_page_size given 16384 is bigger than hw max desc page size 4096
 ```
 
-Verify if the hailo_pci.conf file is existant. If not, create it. Then add "force_desc_page_size=4096" line to the document: 
+Verify if /etc/modprobe.d/hailo_pci.conf exists and it's potential content. If "force_desc_page_size" is already present, modify it's value to 4096, if not, run the following command or write it yourself:
 ```bash 
-[ -f "/etc/modprobe.d/hailo_pci.conf" ] && echo "File exists" || echo "File does not exist"
-# verify if exists, if not, make it : $touch "/etc/modprobe.d/hailo_pci.conf"
-echo force_desc_page_size=4096 >> /etc/modprobe.d/hailo_pci.conf
+echo "options hailo_pci force_desc_page_size=4096" | sudo tee -a /etc/modprobe.d/hailo_pci.conf
 
-# save, close document and run following update commands:
+# update kernel module 
 sudo depmod -a
 sudo modprobe -r hailo_pci
 sudo modprobe  hailo_pci
@@ -115,18 +113,37 @@ Network pose_landmark_heavy/pose_landmark_heavy: 100% | 245 | FPS: 48.69 | ETA: 
 ```
 
 
-### 4. Python Bindings 
-        - PyHailoRT for the platform architecture and installed python version (if using python wrapper)
-            - See chapter 3.4.3 Compiling Specific HailoRT Targets for the compilation of HailoRT-python-binding
-            - create venv at root of hailo environment and install : 
-                - pip install hailort-<version>-cp<python-version[38,39,310,311]>-cp<python-version[38,39,310,311]>-linux_aarch54.whl
+### 4. Compilation of HailoRT-Python Bindings 
+
+Run from hailort/libhailort/bindings/python/platform directory:
+```bash
+python setup.py bdist_wheel
+```
+Build wheel should appear in hailort/libhailort/bindings/python/platform/dist/ and should have a nomenclature similar to :  
+`hailort-<version>-cp<python-version[38,39,310,311]>-cp<python-version[38,39,310,311]>-linux_aarch54.whl`
+
+Move to root of directory and create virtual environment before running the build wheel: 
+```bash
+pip install <hailort-<version>-cp<python-version[38,39,310,311]>-cp<python-version[38,39,310,311]>-linux_aarch54.whl>
+```
+Test your bindings by moving into the proper directory and running the following python script, then verifying the outputted log:
+```bash
+cd python_binding_test_scripts/
+python async_inference_ResNet.py
+# wait for end of script then view output log, wou should see the creation of the network, the HEF configuration time, and such..
+cat hailort.log
+```
+
 
 ### 5. Gstreamer Bindings
 
+```bash
+cd hailort/libhailort/bindings/gstreamer
+# Compiling the plugin:
+cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config release
+```
 
-    - Trial out c++ examples with files given in hailort/libhailort/examples/cpp
-        - Compile 
-
-        - Note :    All function calls are based on the headers provided in the directory hailort/include/hailo.
-                    One can include hailort/include/hailo/hailort.hpp to access all functions.
-
+#### Using the gstreamer plugin 
+The plugin is dependent on libhailort which is included in the `hailort/lib/` directory.
+Use LD_LIBRARY_PATH to specify the location of the libhailort library.
