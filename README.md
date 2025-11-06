@@ -21,6 +21,7 @@ Ubuntu installer requirements :
 ### 2. Build HailoRT PCIe driver
 
 Clone PCIe repository and checkout to proper branch (`hailo8` for our purposes)
+If any issues, refer to [Hailo documentation on driver installation](https://github.com/hailo-ai/hailort-drivers/tree/hailo8/linux/pcie).
 ```bash
 git clone https://github.com/hailo-ai/hailort-drivers/
 cd hailort-drivers/
@@ -30,6 +31,10 @@ cd linux/pcie
 make all
 # Install driver in /lib/modules
 sudo make install
+# If you get a warning message: Warning: modules_install: missing 'System.map' file. Skipping depmod.
+# Run the following command to create symbolic link to your System.map :
+# sudo ln -s /boot/System.map-$(uname -r) /usr/src/linux-headers-$(uname -r)/System.map
+
 # Load driver once, after driver will be loaded on boot
 sudo modprobe hailo_pci
 
@@ -40,20 +45,24 @@ sudo mkdir -p /lib/firmware/hailo
 sudo mv hailo8_fw.<VERSION>.bin /lib/firmware/hailo/hailo8_fw.bin
 
 # Update device manager
-sudp cp ./linux/pcie/51-hailo-udev.rules /etc/udev/rules.d/
+sudo cp ./linux/pcie/51-hailo-udev.rules /etc/udev/rules.d/
+# Copy configuration file to /etc/modprobe.d/
+sudo cp ./linux/pcie/hailo_pci.conf /etc/modprobe.d/
+
 # To apply changes, reboot or run :
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
+
 #### Possible system related issues ::
 
 If encountering the following error log when running your compiled examples for testing :
 ```bash
 [HailoRT] [error] CHECK failed - max_desc_page_size given 16384 is bigger than hw max desc page size 4096
 ```
-
-Verify if /etc/modprobe.d/hailo_pci.conf exists and it's potential content. If "force_desc_page_size" is already present, modify it's value to 4096, if not, run the following command or write it yourself:
+Modify or add the following line to /etc/modprobe.d/hailo_fw.conf to remove comment :
 ```bash 
-echo "options hailo_pci force_desc_page_size=4096" | sudo tee -a /etc/modprobe.d/hailo_pci.conf
+options hailo_pci force_desc_page_size=4096
+#force_desc_page_size determines the max DMA descriptor page size, must be a power of 2, needs to be set on platforms that do not support large PCIe transactions.
 
 # update kernel module 
 sudo depmod -a
@@ -61,8 +70,6 @@ sudo modprobe -r hailo_pci
 sudo modprobe  hailo_pci
 dmesg | grep hailo
 ```
-
-`force_desc_page_size` determines the max DMA descriptor page size, must be a power of 2, needs to be set on platforms that do not support large PCIe transactions.
 
 
 ### 3. Build HailoRT C++ binaries
