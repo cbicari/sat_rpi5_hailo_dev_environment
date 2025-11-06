@@ -75,9 +75,9 @@ dmesg | grep hailo
 ### 3. Build HailoRT C++ binaries
 If not done, change to the parent directory of previous driver ressources and run the following to get and compile proper HailoRT library:
 ```bash
-git clone https://github.com/hailo-ai/hailort/tree/hailo8
+git clone https://github.com/hailo-ai/hailort.git
 cd hailort/
-git checkout hailo8
+git checkout hailo8 #or checkout to most recent version tag (generally they should correspond, ie v4.23.0 tag = hailo8 branch as of 01-11-2025)
 # next compilation will create "build/hailort/hailortcli/hailortcli" binary and "build/hailort/libhailort/src/libhailort.so.<VERSION> library.
 cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config release
 # run install script to manage system install of lib and binary
@@ -94,7 +94,7 @@ You should have something along the lines of:
 Executing on device: 0001:01:00.0
 Identifying board
 Control Protocol Version: 2
-Firmware Version: 4.22.0 (release,app,extended context switch buffer)
+Firmware Version: 4.23.0 (release,app,extended context switch buffer)
 Logger Version: 0
 Board Name: Hailo-8
 Device Architecture: HAILO8
@@ -145,12 +145,81 @@ cat hailort.log
 ### 5. Gstreamer Bindings
 
 ```bash
+# Install Gstreamer and dependencies 
+sudo apt update
+sudo apt install -y \
+    libglib2.0-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    gstreamer1.0-tools \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav
+
+# Verify Gstreamer 
+# Version
+gst-inspect-1.0 --version
+# Simple test script
+gst-launch-1.0 fakesrc num-buffers=5 ! fakesink
+```
+You should obtain something along the lines of : 
+
+```bash
+# Version
+gst-inspect-1.0 version 1.22.0
+GStreamer 1.22.0
+https://tracker.debian.org/pkg/gstreamer1.0
+
+# Simple test script
+Setting pipeline to PAUSED ...
+Pipeline is PREROLLING ...
+Pipeline is PREROLLED ...
+Setting pipeline to PLAYING ...
+Redistribute latency...
+New clock: GstSystemClock
+Got EOS from element "pipeline0".
+Execution ended after 0:00:00.000140945
+Setting pipeline to NULL ...
+Freeing pipeline ...
+```
+Build the bindings : 
+```bash
 cd hailort/libhailort/bindings/gstreamer
 # Compiling the plugin:
 cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config release
 ```
 
-#### Using the gstreamer plugin 
-The plugin is dependent on libhailort which is included in the `hailort/lib/` directory.
-Use LD_LIBRARY_PATH to specify the location of the libhailort library.
+#### Register the plugin
+
+```bash
+sudo cp build/libgsthailo.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0/
+# maybe this one though :   /usr/lib/arm-linux-gnueabihf/gstreamer-1.0/
+
+# refresh plugin cache and verify plugin details 
+gst-inspect-1.0 hailo
+```
+You should get something along the lines of :
+```bash
+Plugin Details:
+  Name                     hailo
+  Description              hailo gstreamer plugin
+  Filename                 /lib/aarch64-linux-gnu/gstreamer-1.0/libgsthailo.so
+  Version                  1.0
+  License                  unknown
+  Source module            hailo
+  Binary package           GStreamer
+  Origin URL               http://gstreamer.net/
+
+  hailodevicestats: hailodevicestats element
+  hailonet: hailonet element
+  synchailonet: sync hailonet element
+
+  3 features:
+  +-- 3 elements
+  ```
+
+
+  From here on, your installation of PCIe Driver, C++/C headers (HailoRT), Python and Gstreamer Bindings should be good!
