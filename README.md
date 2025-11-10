@@ -240,14 +240,6 @@ Setting pipeline to NULL ...
 Freeing pipeline ...
 ```
 
-##### Test 2 : Run simple live camera inference (no video output)
-gst-launch-1.0 v4l2src ! videoconvert ! videoscale ! video/x-raw,width=640,height=480 ! hailonet hef-path=/path/to/your_model.hef ! hailofilter ! fakesink
-
-##### Test 3 : Simple output with visualization
-visualize results:
-gst-launch-1.0 filesrc location=sample.mp4 ! decodebin ! hailonet hef-path=/path/to/yolov5.hef ! \
-    hailofilter ! hailosink display=true
-
 
 
   From here on, your installation of PCIe Driver, C++/C headers (HailoRT), Python and Gstreamer Bindings should be good!
