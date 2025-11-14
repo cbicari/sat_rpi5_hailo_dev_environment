@@ -247,48 +247,6 @@ From here on, your installation of PCIe Driver, C++/C headers (HailoRT), Python 
 
 
 
-### 6. Tappas core 
-TAPPAS is Hailo's set of full application examples, implementing pipeline elements and pre-trained AI tasks to facilitate development and time to market. Here are the steps to install the Tappas libs.
-
-```bash
-git clone https://github.com/hailo-ai/tappas.git
-cd tappas/
-# get latest version / we're working on v3.31.0 right now
-git checkout v5.1.0
-# Link local hailort repo for build purposes
-mkdir hailort
-ln -s ./../../hailort/ hailort/sources
-# Install required packages 
-sudo apt-get install -y rsync ffmpeg x11-utils python3-dev python3-pip python3-setuptools python3-virtualenv python-gi-dev libgirepository1.0-dev gcc-12 g++-12 cmake git libzmq3-dev
-# Install OpenCV
-sudo apt-get install -y libopencv-dev python3-opencv
-# Install PyGobject
-sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0
-
-# TAPPAS installation
-# Link .so for install script :: make sure this TARGET path is the good one for you (first path in command)
-# It should have been installed during the first steps of this README.
-sudo ln -s /usr/local/lib/libhailort.so /usr/lib/libhailort.so
-
-# For some reason, the 'rpi5' target platform breaks but the 'rpi' tag gives proper results. However it stays stuck on wanting to use Gcc 9 and G++ 9 although the system has the 12th version. I changed gcc_version to 12 in tappas/install.sh script function and it's all happily compiling :
-```cpp 
-function set_gcc_version(){
-  if [ "$target_platform" == "rpi" ] || [ "$target_platform" == "rockchip" ]; then
-    gcc_version=12
-}
-```
-For TAPPAS build purposes, as the current setup doesn't get proper resources (verify if fixed with next versions) we must add an additional symbolic path. Make sure the following paths correspond to your work environment :
-```bash
-ln -s /home/sat/Desktop/sat_rpi5_hailo_dev_environment/hailort/hailort/libhailort/bindings/gstreamer/gst-hailo/metadata/tensor_meta.hpp /home/sat/Desktop/sat_rpi5_hailo_dev_environment/tappas/core/hailo/plugins/filter/tensor_meta.hpp
-```
-
-```bash
-# run install for rpi5 and do not reinstall hailort
-./install.sh --skip-hailort --target-platform rpi
-```
-N.B. Tappas installation creates it's own virtual environment 'hailo_tappas_venv' for it's ressources which is distinct from the venv we used for the python buildwheel. Verify if this does not create useless conflicts. 
-
-
 
 
 ## Ossia Considerations

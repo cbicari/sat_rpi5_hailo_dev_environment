@@ -49,6 +49,35 @@ bool is_video_file(const std::string& path) {
     return std::find(video_extensions.begin(), video_extensions.end(), extension) != video_extensions.end();
 }
 
+bool is_directory_of_images(const std::string& path, int &entry_count, size_t batch_size) {
+    entry_count = 0;
+    if (fs::exists(path) && fs::is_directory(path)) {
+        bool has_images = false;
+        for (const auto& entry : fs::directory_iterator(path)) {
+            if (fs::is_regular_file(entry)) {
+                entry_count++;
+                if (!is_image_file(entry.path().string())) {
+                    // Found a non-image file
+                    return false;
+                }
+                has_images = true; 
+            }
+        }
+        if (entry_count % batch_size != 0) {
+            throw std::invalid_argument("Directory contains " + std::to_string(entry_count) + " images, which is not divisible by batch size " + std::to_string(batch_size));
+        }
+        return has_images; 
+    }
+    return false;
+}
+
+bool is_image(const std::string& path) {
+    return fs::exists(path) && fs::is_regular_file(path) && is_image_file(path);
+}
+
+bool is_video(const std::string& path) {
+    return fs::exists(path) && fs::is_regular_file(path) && is_video_file(path);
+}
 
 std::string get_hef_name(const std::string &path)
 {
@@ -110,6 +139,16 @@ InputType determine_input_type(const std::string& input_path, cv::VideoCapture &
 
     InputType input_type;
     int directory_entry_count;
+    if (is_directory_of_images(input_path, directory_entry_count, batch_size)) {
+        input_type.is_directory = true;
+        input_type.directory_entry_count = directory_entry_count;
+    } else if (is_image(input_path)) {
+        input_type.is_image = true;
+    } else if (is_video(input_path)) {
+        input_type.is_video = true;
+        capture = open_video_capture(input_path, std::ref(capture), org_height, org_width, frame_count);
+    } else {
+        std::cout << "Input is not an image or video, trying to open as camera" << std::endl;
         input_type.is_camera = true;
         capture = open_video_capture(input_path, std::ref(capture), org_height, org_width, frame_count);
     }
