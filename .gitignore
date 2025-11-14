@@ -4,5 +4,5 @@ venv_hailo_rpi/
 gstreamer-sombrerodk-1.26.1-20250529-devel-arm64.tar.xz
 hailort.log
 venv/
-tappas_v3.29.1/
-tappas_3.29.1_linux_installer.zip
+tappas/
+custom_cpp_examples/Hailo-Application-Code-Examples/
