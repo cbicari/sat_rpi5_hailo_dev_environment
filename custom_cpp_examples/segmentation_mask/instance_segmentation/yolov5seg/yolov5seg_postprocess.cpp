@@ -18,7 +18,10 @@ std::vector<const hailo_detection_with_byte_mask_t*> get_detections(const uint8_
         const auto *det_ptr =
             reinterpret_cast<const hailo_detection_with_byte_mask_t*>(src_ptr + offset);
         offset += sizeof(hailo_detection_with_byte_mask_t) + det_ptr->mask_size;
-        detections.emplace_back(det_ptr);
+        if(det_ptr->class_id == 0 ){
+    //        std::cout << det_ptr->class_id << std::endl;
+            detections.emplace_back(det_ptr);
+        }
     }
     return detections;
 }
@@ -32,7 +35,7 @@ cv::Mat draw_detections_and_mask(const uint8_t *src_ptr,
     for (const auto *detection : detections) {
         const int box_w = static_cast<int>(std::ceil((detection->box.x_max - detection->box.x_min) * width));
         const int box_h = static_cast<int>(std::ceil((detection->box.y_max - detection->box.y_min) * height));
-        const cv::Vec3b color = indexToColor(detection->class_id);
+        const cv::Vec3b color = cv::Vec3b(255, 255, 255);
 
         const uint8_t *mask_ptr = reinterpret_cast<const uint8_t*>(detection) + sizeof(hailo_detection_with_byte_mask_t);
         const size_t expected = static_cast<size_t>(box_w) * static_cast<size_t>(box_h);
@@ -50,15 +53,19 @@ cv::Mat draw_detections_and_mask(const uint8_t *src_ptr,
                 }
             }
         }
+        /*
         cv::rectangle(
             frame,
             cv::Rect(static_cast<int>(detection->box.x_min * width),
                      static_cast<int>(detection->box.y_min * height),
                      box_w, box_h),
             color, 1);
+        */
     }
 
-    cv::addWeighted(frame, 1.0, overlay, 0.7, 0.0, frame);
+    //cv::addWeighted(frame, 0, overlay, 1, 0.0, frame);
+    //return frame;
+    overlay.copyTo(frame); 
     return frame;
 }
 

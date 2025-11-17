@@ -50,6 +50,7 @@ PostprocessCallback make_instseg_postprocess_cb(const int model_w, const int mod
 
         // 3) Inverse letterbox back to original frame size
         map_model_to_frame(model_space, map, frame_to_draw);
+       // frame_to_draw = model_space.clone();
     };
 }
 
