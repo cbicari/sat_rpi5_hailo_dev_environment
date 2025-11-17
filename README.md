@@ -245,6 +245,8 @@ Add some more complex Gstreamer examples here !
 From here on, your installation of PCIe Driver, C++/C headers (HailoRT), Python and Gstreamer Bindings should be good!
 
 
+### 6. Run C++ program with segmentation model to generate black and white mask
+--add details here 
 
 
 
