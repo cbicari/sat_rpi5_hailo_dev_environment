@@ -1,14 +1,12 @@
 Instance Segmentation
 ====================
-This example performs instance segmentation using a **Hailo8** or **Hailo10** device.  
-It receives a HEF and images/video/camera as input, and returns the image\video with annotations of detected objects, bounding boxes, and instance masks.
-
-![Instance Segmentation Example](instance_seg.gif)
+This example performs instance segmentation using a **Hailo8** device.
+It receives a HEF and camera as input, and returns a black and white mask exclusively of identified persons in camera field.
 
 Requirements
 ------------
 
-- HailoRT==4.22.0
+- HailoRT>=4.22.0
 - OpenCV >= 4.5.4
     ```shell script
     sudo apt-get install -y libopencv-dev python3-opencv
