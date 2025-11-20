@@ -2,18 +2,22 @@
 
 In this manual you will find the steps to compile Hailo's PCIe driver, C++ headers, Python and basic Gstreamer bindings (Tappas (advanced Gstreamer pipelines for Hailo apps) not included). There are also some examples to test the proper installation of the software ressources and system setup such as a basic Python, Gstreamer, and Cpp example with compilation ressources for the latter. 
 
-#### Nota Bene : Simplicity's Sake
-If ever you want the easiest and fastest install updated by rPi staff, use the following command :
-```bash
-sudo apt install hailo-all 
-```
-You will not have headers and all detailed ressources handy but the PCIe driver (hailofw), Hailo Runtime binairies (hailort), advanced Gstreamer ressources with Tappas utility pipeline (hailo-tappas-core), python bindings and rpicam-apps-postprocessing will work "out of the box" and take less than five minutes. 
-At the time of writing this (11-2025), this package only works on rPi `bookworm` and not the most recent `trixie` distribution. 
-
-To view which versions are installed with this package, run the following command : 
-```bash
-apt show hailo-all
-```
+> [!NOTE]
+> #### Simplicity's Sake
+> If ever you want the easiest and fastest install updated by rPi staff, use the following command :
+> 
+> ```bash
+> sudo apt install hailo-all 
+> ```
+>
+> You will not have headers and all detailed ressources handy but the PCIe driver (hailofw), Hailo Runtime binairies (hailort), advanced Gstreamer ressources with Tappas utility pipeline (hailo-tappas-core), python bindings and rpicam-apps-postprocessing will work "out of the box" and take less than five minutes. 
+> At the time of writing this (11-2025), this package only works on rPi `bookworm` and not the most recent `trixie` distribution. 
+> 
+> To view which versions are installed with this package, run the following command : 
+> 
+> ```bash
+> apt show hailo-all
+> ```
 
 ## Steps to configuring environment 
 
@@ -48,15 +52,18 @@ make all
 # Install driver in /lib/modules
 sudo make install
 ```
-> [!NOTE]
-> If you get the following warning message and compilation fails : 
-```bash
-Warning: modules_install: missing 'System.map' file. Skipping depmod.
-```
+> [!TIP]
+> If you get the following warning message and compilation fails :
+>  
+> ```bash
+> Warning: modules_install: missing 'System.map' file. Skipping depmod.
+> ```
+>
 > Run the following command to create symbolic link to your System.map :
-```bash
-sudo ln -s /boot/System.map-$(uname -r) /usr/src/linux-headers-$(uname -r)/System.map
-```
+>
+> ```bash
+> sudo ln -s /boot/System.map-$(uname -r) /usr/src/linux-headers-$(uname -r)/System.map
+> ```
 
 Follow with these commands : 
 
