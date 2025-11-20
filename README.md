@@ -1,12 +1,28 @@
-# Hailo-rPi5 dev environment setup 
+# Manual Setup of rPi5-Hailo8 Development Environment 
+
+In this manual you will find the steps to compile Hailo's PCIe driver, C++ headers, Python and basic Gstreamer bindings (Tappas (advanced Gstreamer pipelines for Hailo apps) not included). There are also some examples to test the proper installation of the software ressources and system setup such as a basic Python, Gstreamer, and Cpp example with compilation ressources for the latter. 
+
+#### Nota Bene : Simplicity's Sake
+If ever you want the easiest and fastest install updated by rPi staff, use the following command :
+```bash
+sudo apt install hailo-all 
+```
+You will not have headers and all detailed ressources handy but the PCIe driver (hailofw), Hailo Runtime binairies (hailort), advanced Gstreamer ressources with Tappas utility pipeline (hailo-tappas-core), python bindings and rpicam-apps-postprocessing will work "out of the box" and take less than five minutes. 
+At the time of writing this (11-2025), this package only works on rPi `bookworm` and not the most recent `trixie` distribution. 
+
+To view which versions are installed with this package, run the following command : 
+```bash
+apt show hailo-all
+```
 
 ## Steps to configuring environment 
 
-Please refer to manual in repository for more detailed explanations or get the most recent version by creating an account with Hailo and access their software ressources.
-
+Steps and information given here should be sufficient to help you get through. For more detailed explanations, please refer to the most recent user manuals provided by [Hailo](https://hailo.ai/). You will need to create an account to access developper ressources.
 
 
 ### 1. Ubuntu requirements : 
+
+You may install these dependencies with `apt install`.
 
 Ubuntu installer requirements :
 
@@ -20,8 +36,8 @@ Ubuntu installer requirements :
 
 ### 2. Build HailoRT PCIe driver
 
-Clone PCIe repository and checkout to proper branch (`hailo8` for our purposes)
-If any issues, refer to [Hailo documentation on driver installation](https://github.com/hailo-ai/hailort-drivers/tree/hailo8/linux/pcie).
+Clone PCIe repository, checkout to proper branch and make binairies.
+##### N.B. Normally, the `hailo8` branch should correspond to the latest version available for the rPi5-hailo8 system. If any issues occur, refer to the [Hailo README](https://github.com/hailo-ai/hailort-drivers/tree/hailo8/linux/pcie) or [User Manual](https://hailo.ai/).
 ```bash
 git clone https://github.com/hailo-ai/hailort-drivers/
 cd hailort-drivers/
@@ -31,10 +47,20 @@ cd linux/pcie
 make all
 # Install driver in /lib/modules
 sudo make install
-# If you get a warning message: Warning: modules_install: missing 'System.map' file. Skipping depmod.
-# Run the following command to create symbolic link to your System.map :
-# sudo ln -s /boot/System.map-$(uname -r) /usr/src/linux-headers-$(uname -r)/System.map
+```
+> [!NOTE]
+> If you get the following warning message and compilation fails : 
+```bash
+Warning: modules_install: missing 'System.map' file. Skipping depmod.
+```
+> Run the following command to create symbolic link to your System.map :
+```bash
+sudo ln -s /boot/System.map-$(uname -r) /usr/src/linux-headers-$(uname -r)/System.map
+```
 
+Follow with these commands : 
+
+```bash
 # Load driver once, after driver will be loaded on boot
 sudo modprobe hailo_pci
 
@@ -52,6 +78,21 @@ sudo cp ./linux/pcie/hailo_pci.conf /etc/modprobe.d/
 # To apply changes, reboot or run :
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
+
+
+### Set PCIe to Gen3
+To achieve optimal performance from the Hailo device, it is necessary to set PCIe to Gen3. While using Gen2 is an option, it will result in lower performance. Open the Raspberry Pi configuration tool:
+
+```bash
+sudo raspi-config
+```
+Select option "6 Advanced Options", then select option "A8 PCIe Speed". Choose "Yes" to enable PCIe Gen 3 mode. Click "Finish" to exit.
+
+##### Reboot your Raspberry Pi.
+```bash
+sudo reboot
+```
+
 
 #### Possible system related issues ::
 

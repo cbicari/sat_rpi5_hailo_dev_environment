@@ -16,7 +16,7 @@ using namespace hailo_utils;
 namespace fs = std::filesystem;
 
 /////////// Constants ///////////
-constexpr size_t MAX_QUEUE_SIZE = 5;
+constexpr size_t MAX_QUEUE_SIZE = 3;
 
 std::shared_ptr<BoundedTSQueue<std::pair<std::vector<cv::Mat>, std::vector<cv::Mat>>>> preprocessed_batch_queue =
     std::make_shared<BoundedTSQueue<std::pair<std::vector<cv::Mat>, std::vector<cv::Mat>>>>(MAX_QUEUE_SIZE);

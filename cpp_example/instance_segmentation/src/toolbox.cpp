@@ -183,7 +183,6 @@ hailo_status run_post_process(
     while (true) {
         InferenceResult output_item;
 
-        std::cerr << "preprocess: "<<  results_queue->size() << std::endl;
         if (!results_queue->pop(output_item)) {
             break;
         }
