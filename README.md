@@ -93,31 +93,29 @@ To achieve optimal performance from the Hailo device, it is necessary to set PCI
 ```bash
 sudo raspi-config
 ```
-Select option "6 Advanced Options", then select option "A8 PCIe Speed". Choose "Yes" to enable PCIe Gen 3 mode. Click "Finish" to exit.
-
-##### Reboot your Raspberry Pi.
-```bash
-sudo reboot
-```
+Select option "6 Advanced Options", then select option "A8 PCIe Speed". Choose "Yes" to enable PCIe Gen 3 mode. Click "Finish" to exit. Then reboot your system. 
 
 
-#### Possible system related issues ::
-
-If encountering the following error log when running your compiled examples for testing :
-```bash
-[HailoRT] [error] CHECK failed - max_desc_page_size given 16384 is bigger than hw max desc page size 4096
-```
-Modify or add the following line to /etc/modprobe.d/hailo_fw.conf to remove comment :
-```bash 
-options hailo_pci force_desc_page_size=4096
-#force_desc_page_size determines the max DMA descriptor page size, must be a power of 2, needs to be set on platforms that do not support large PCIe transactions.
-
-# update kernel module 
-sudo depmod -a
-sudo modprobe -r hailo_pci
-sudo modprobe  hailo_pci
-dmesg | grep hailo
-```
+>[!WARNING]
+> 
+> If encountering the following error log when running your compiled examples for testing :
+> 
+> ```bash
+> [HailoRT] [error] CHECK failed - max_desc_page_size given 16384 is bigger than hw max desc page size 4096
+> ```
+>
+> Modify or add the following line to /etc/modprobe.d/hailo_fw.conf to remove comment :
+>
+> ```bash 
+> options hailo_pci force_desc_page_size=4096
+> #force_desc_page_size determines the max DMA descriptor page size, must be a power of 2, needs to be set on platforms that do not support large PCIe transactions.
+> 
+> # update kernel module 
+> sudo depmod -a
+> sudo modprobe -r hailo_pci
+> sudo modprobe  hailo_pci
+> dmesg | grep hailo
+> ```
 
 
 ### 3. Build HailoRT C++ binaries
