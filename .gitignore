@@ -1,8 +1,8 @@
+cpp_example/instance_segmentation/hailort.log
+cpp_example/instance_segmentation/build/
+
 hailort/
 hailort-drivers/
 venv_hailo_rpi/
-gstreamer-sombrerodk-1.26.1-20250529-devel-arm64.tar.xz
-hailort.log
+
 venv/
-tappas/
-custom_cpp_examples/Hailo-Application-Code-Examples/
